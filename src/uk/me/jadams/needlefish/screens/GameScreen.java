@@ -83,7 +83,8 @@ public class GameScreen implements Screen
     @Override
     public void show()
     {
-
+        camera.setToOrtho(false, 192, 108);
+        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
@@ -94,7 +95,7 @@ public class GameScreen implements Screen
         engine.update(delta);
 
         batch.begin();
-        
+
         Box2DSprite.draw(batch, world);
         playerExplode.render(batch, delta);
         batch.end();

@@ -10,13 +10,15 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import uk.me.jadams.needlefish.screens.GameScreen;
+import uk.me.jadams.needlefish.screens.MenuScreen;
 
 public class Needlefish extends Game
 {
-    SpriteBatch batch;
-    OrthographicCamera camera;
-    Texture texture;
-    Sprite sprite;
+    private SpriteBatch batch;
+    private OrthographicCamera camera;
+    private Texture texture;
+    
+    public GameScreen gameScreen;
 
     @Override
     public void create()
@@ -24,17 +26,18 @@ public class Needlefish extends Game
         Assets.load();
         
         batch = new SpriteBatch();
-        camera = new OrthographicCamera(192, 108);
-        camera.position.x = 192 / 2;
-        camera.position.y = 108 / 2;
+        camera = new OrthographicCamera(1920, 1080);
+        camera.position.x = 1920 / 2;
+        camera.position.y = 1080 / 2;
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         texture = Assets.bg;
         texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
         
-        GameScreen gameScreen = new GameScreen(camera, batch);
-        this.setScreen(gameScreen);
+        MenuScreen menuScreen = new MenuScreen(this, camera, batch);
+        gameScreen = new GameScreen(camera, batch);
+        this.setScreen(menuScreen);
     }
 
     @Override
@@ -42,11 +45,11 @@ public class Needlefish extends Game
     {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
         batch.setProjectionMatrix(camera.combined);
 
         batch.begin();
-        batch.draw(texture, 0, 0, 192, 108, 0, 0, 1, 1080 / 32);
+        batch.draw(texture, 0, 0, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 1080 / 32);
         batch.end();
         
         super.render();
