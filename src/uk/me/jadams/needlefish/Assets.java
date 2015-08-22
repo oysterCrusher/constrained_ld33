@@ -8,6 +8,7 @@ public class Assets
     public static Texture bg;
     public static Texture player;
     public static Texture bullet;
+    public static Texture enemy;
     
     private static Texture loadTexture(String file)
     {
@@ -19,5 +20,6 @@ public class Assets
         bg = loadTexture("bg.png");
         player = loadTexture("player.png");
         bullet = loadTexture("bullet.png");
+        enemy = loadTexture("enemy.png");
     }
 }

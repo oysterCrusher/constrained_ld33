@@ -1,18 +1,29 @@
 package uk.me.jadams.needlefish;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
+import uk.me.jadams.needlefish.components.AIMovementTrackPlayerComponent;
+import uk.me.jadams.needlefish.components.BodyComponent;
 
 public class B2DObjectFactory
 {
-    private static final short GROUP_BULLET = -1;
+    private static final short CATEGORY_PLAYER = 0x0001;
+    private static final short CATEGORY_BULLET = 0x0002;
+    private static final short CATEGORY_AI = 0x0004;
+    private static final short CATEGORY_WALL = 0x0008;
+    
+    private static final short MASK_BULLET = CATEGORY_AI | CATEGORY_WALL | CATEGORY_PLAYER;
+    private static final short MASK_AI = CATEGORY_BULLET | CATEGORY_PLAYER;
 
     private B2DObjectFactory()
     {
@@ -22,7 +33,7 @@ public class B2DObjectFactory
     public static Body newPlayer(World world)
     {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = BodyDef.BodyType.DynamicBody; // Maybe should be KinematicBody?
         bodyDef.position.set(192 / 2, 108 / 2);
 
         Body body = world.createBody(bodyDef);
@@ -35,8 +46,10 @@ public class B2DObjectFactory
         fixDef.density = 1f;
         fixDef.restitution = 0;
         fixDef.friction = 0;
+        fixDef.filter.categoryBits = CATEGORY_PLAYER;
 
-        body.createFixture(fixDef);
+        Fixture fixture = body.createFixture(fixDef);
+        fixture.setUserData(new CollisionData(FixtureTypes.PLAYER));
         body.setFixedRotation(true);
         shape.dispose();
 
@@ -56,19 +69,23 @@ public class B2DObjectFactory
 
         ChainShape shape = new ChainShape();
 
-        Vector2[] vertices = new Vector2[4];
-        vertices[0] = new Vector2(0, 0);
-        vertices[1] = new Vector2(172, 0);
-        vertices[2] = new Vector2(172, 88);
-        vertices[3] = new Vector2(0, 88);
+        Vector2[] vertices = new Vector2[6];
+        vertices[0] = new Vector2(0, 40);
+        vertices[1] = new Vector2(80, 10);
+        vertices[2] = new Vector2(160, 40);
+        vertices[3] = new Vector2(160, 60);
+        vertices[4] = new Vector2(80, 88);
+        vertices[5] = new Vector2(0, 60);
 
         shape.createLoop(vertices);
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = shape;
         fixDef.density = 1f;
+        fixDef.filter.categoryBits = CATEGORY_WALL;
 
-        body.createFixture(fixDef);
+        Fixture fixture = body.createFixture(fixDef);
+        fixture.setUserData(new CollisionData(FixtureTypes.WALL));
 
         shape.dispose();
 
@@ -85,6 +102,7 @@ public class B2DObjectFactory
         bodyDef.position.set(sx, sy);
 
         Body body = world.createBody(bodyDef);
+        body.setBullet(true);
 
         CircleShape shape = new CircleShape();
         shape.setRadius(0.5f);
@@ -94,9 +112,12 @@ public class B2DObjectFactory
         fixDef.density = 1f;
         fixDef.restitution = 1;
         fixDef.friction = 0;
-        fixDef.filter.groupIndex = GROUP_BULLET;
+        fixDef.filter.categoryBits = CATEGORY_BULLET;
+        fixDef.filter.maskBits = MASK_BULLET;
+        
+        Fixture fixture = body.createFixture(fixDef);
+        fixture.setUserData(new CollisionData(FixtureTypes.BULLET));
 
-        body.createFixture(fixDef);
         body.setFixedRotation(true);
         shape.dispose();
 
@@ -107,6 +128,44 @@ public class B2DObjectFactory
         float vy = (float) (Math.sin(angle) * 10);
 
         body.setLinearVelocity(vx, vy);
+        return body;
+    }
+    
+    public static Body ai(PooledEngine engine, World world)
+    {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(-20, 108 / 2);
+        bodyDef.angle = (float) (Math.PI / 2f);
+
+        Body body = world.createBody(bodyDef);
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(1.5f);
+
+        FixtureDef fixDef = new FixtureDef();
+        fixDef.shape = shape;
+        fixDef.density = 1f;
+        fixDef.restitution = 0;
+        fixDef.friction = 0;
+        fixDef.filter.categoryBits = CATEGORY_AI;
+        fixDef.filter.maskBits = MASK_AI;
+
+        Fixture fixture = body.createFixture(fixDef);
+        fixture.setUserData(new CollisionData(FixtureTypes.AI));
+        body.setFixedRotation(true);
+        shape.dispose();
+
+        body.setLinearVelocity(10, 0);
+
+        Box2DSprite sprite = new Box2DSprite(Assets.enemy);
+        body.setUserData(sprite);
+        
+        Entity aiEntity = engine.createEntity();
+        aiEntity.add(new BodyComponent(body));
+        aiEntity.add(new AIMovementTrackPlayerComponent());
+        engine.addEntity(aiEntity);
+
         return body;
     }
 }
