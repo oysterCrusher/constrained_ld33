@@ -33,6 +33,6 @@ public class Assets
         wall = loadTexture("wall.png");
         vertex = loadTexture("vertex.png");
         
-        titleFont = loadFont("bpdotssquares.fnt");
+        titleFont = loadFont("bpdotssquares2.fnt");
     }
 }

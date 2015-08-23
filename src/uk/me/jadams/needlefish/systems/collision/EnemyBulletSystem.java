@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 
 import uk.me.jadams.needlefish.CollisionData;
 import uk.me.jadams.needlefish.FixtureTypes;
+import uk.me.jadams.needlefish.Scoring;
 import uk.me.jadams.needlefish.Utils;
 import uk.me.jadams.needlefish.components.AIMovementTrackPlayerComponent;
 import uk.me.jadams.needlefish.components.BodyComponent;
@@ -23,14 +24,17 @@ public class EnemyBulletSystem extends IteratingSystem
     private final World world;
     
     private final Engine engine;
+    
+    private final Scoring scoring;
 
     @SuppressWarnings("unchecked")
-    public EnemyBulletSystem(World world, Engine engine)
+    public EnemyBulletSystem(World world, Engine engine, Scoring scoring)
     {
         super(Family.all(BodyComponent.class, AIMovementTrackPlayerComponent.class).get());
 
         this.world = world;
         this.engine = engine;
+        this.scoring = scoring;
 
         bodyMap = ComponentMapper.getFor(BodyComponent.class);
     }
@@ -56,6 +60,7 @@ public class EnemyBulletSystem extends IteratingSystem
                         engine.removeEntity(entity);
                         world.destroyBody(collisonData.getOtherBody());
 
+                        scoring.add(50);
                         // TODO - Particle explosion!
                     }
 

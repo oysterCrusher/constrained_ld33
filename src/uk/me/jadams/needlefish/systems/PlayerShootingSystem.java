@@ -31,7 +31,7 @@ public class PlayerShootingSystem extends EntitySystem
     public void reset()
     {
         timer = 0;
-        timerFire = 5;
+        timerFire = 3;
     }
 
     @Override
