@@ -31,14 +31,12 @@ import uk.me.jadams.needlefish.components.InputComponent;
 import uk.me.jadams.needlefish.systems.EnemySpawnSystem;
 import uk.me.jadams.needlefish.systems.InputSystem;
 import uk.me.jadams.needlefish.systems.PlayerShootingSystem;
-import uk.me.jadams.needlefish.systems.aimovement.TrackPlayerSystem;
+import uk.me.jadams.needlefish.systems.TrackPlayerSystem;
 import uk.me.jadams.needlefish.systems.collision.EnemyBulletSystem;
 import uk.me.jadams.needlefish.systems.collision.PlayerCollisionSystem;
 
 public class GameScreen implements Screen
 {
-    private final Needlefish needlefish;
-
     private final OrthographicCamera camera;
 
     private final OrthographicCamera uiCamera;
@@ -74,13 +72,12 @@ public class GameScreen implements Screen
 
     public GameScreen(Needlefish needlefish, OrthographicCamera camera, SpriteBatch batch, Scoring scoring)
     {
-        this.needlefish = needlefish;
         this.camera = camera;
         this.batch = batch;
         this.scoring = scoring;
 
         uiCamera = new OrthographicCamera(1920, 1080);
-        
+
         gameStage = new GameStage(uiCamera, batch);
         menuStage = new MenuStage(needlefish, uiCamera, batch);
     }
@@ -94,7 +91,7 @@ public class GameScreen implements Screen
         scoring.start();
 
         engine = new PooledEngine();
-        
+
         camera.setToOrtho(false, 192, 108);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
@@ -187,8 +184,10 @@ public class GameScreen implements Screen
     @Override
     public void resize(int width, int height)
     {
-        gameStage.getViewport().update(width, height);
-        menuStage.getViewport().update(width, height);
+        // TODO - something here to get the world camera nicely resized.
+
+        gameStage.getViewport().update(width, height, true);
+        menuStage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -234,6 +233,7 @@ public class GameScreen implements Screen
                         float x = collisonData.getX();
                         float y = collisonData.getY();
                         bulletWall.start(x, y);
+                        Assets.wallBounce.play(0.6f);
                     }
 
                     collisonData.markProcessed();
@@ -275,9 +275,9 @@ public class GameScreen implements Screen
 
                 float angle = 270 - (float) (Math.atan2((vertex.x - lastVertex.x), (vertex.y - lastVertex.y)) / Math.PI * 180);
 
-                batch.draw(Assets.wall, vertex.x, vertex.y, 0, 0, l, 0.7f, 1, 1, angle, 0, 0, 1, 1, false, false);
+                batch.draw(Assets.wall, vertex.x, vertex.y, 0, 0, l, 1f, 1, 1, angle, 0, 0, 1, 1, false, false);
 
-                batch.draw(Assets.vertex, vertex.x - 0.9f, vertex.y - 0.9f, 1.8f, 1.8f);
+                batch.draw(Assets.vertex, vertex.x - 1.2f, vertex.y - 1.2f, 2.4f, 2.4f);
 
                 lastVertex.x = vertex.x;
                 lastVertex.y = vertex.y;
@@ -290,7 +290,7 @@ public class GameScreen implements Screen
         isOver = true;
         justOver = true;
     }
-    
+
     public void stopSystems()
     {
         engine.removeSystem(inputSystem);

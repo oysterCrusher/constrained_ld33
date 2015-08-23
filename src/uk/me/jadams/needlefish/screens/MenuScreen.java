@@ -36,17 +36,19 @@ public class MenuScreen implements Screen
     @Override
     public void show()
     {
-        Label title = new Label("Needlefish", new LabelStyle(Assets.titleFont, Color.valueOf("8DA7BEFF")));
+        Label title = new Label("Constrained", new LabelStyle(Assets.titleFont, Color.valueOf("F26937")));
 
         Drawable buttonDrawable = new BaseDrawable();
 
         TextButton playButton = new TextButton("Play", new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont));
-        playButton.getStyle().fontColor = Color.valueOf("E26D5C");
+        playButton.getStyle().fontColor = Color.valueOf("F26937");
+        playButton.getStyle().overFontColor = Color.valueOf("C8C8C8");
         playButton.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
+                Assets.buttonPress.play();
                 needlefish.setScreen(needlefish.gameScreen);
             }
         });

@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MenuStage extends Stage
 {
-    private static final LabelStyle LABEL_STYLE = new LabelStyle(Assets.titleFont, Color.valueOf("8DA7BEFF"));
+    private static final LabelStyle LABEL_STYLE = new LabelStyle(Assets.titleFont, Color.valueOf("F26937"));
     
     private final Label highScoreField;
     
@@ -39,14 +39,15 @@ public class MenuStage extends Stage
         Drawable buttonDrawable = new BaseDrawable();
         TextButtonStyle buttonStyle = new TextButtonStyle(buttonDrawable, buttonDrawable, buttonDrawable, Assets.titleFont);
         TextButton playButton = new TextButton("Play", buttonStyle);
-        playButton.getStyle().fontColor = Color.valueOf("E26D5C");
-        playButton.getStyle().overFontColor = Color.BLACK;
+        playButton.getStyle().fontColor = Color.valueOf("F26937");
+        playButton.getStyle().overFontColor = Color.valueOf("C8C8C8");
 
         playButton.addListener(new ChangeListener()
         {
             @Override
             public void changed(ChangeEvent event, Actor actor)
             {
+                Assets.buttonPress.play();
                 needlefish.setScreen(needlefish.gameScreen);
             }
         });

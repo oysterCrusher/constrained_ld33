@@ -51,9 +51,9 @@ public class Needlefish extends Game
 
         batch.setProjectionMatrix(camera.combined);
 
-//        batch.begin();
-//        batch.draw(texture, 0, 0, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 1080 / 32);
-//        batch.end();
+        batch.begin();
+        batch.draw(texture, 0, 0, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 1080 / 32);
+        batch.end();
         
         super.render();
     }

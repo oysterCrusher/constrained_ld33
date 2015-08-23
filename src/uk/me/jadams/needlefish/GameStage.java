@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameStage extends Stage
 {
-    private static final LabelStyle LABEL_STYLE = new LabelStyle(Assets.titleFont, Color.valueOf("8DA7BEFF"));
+    private static final LabelStyle LABEL_STYLE = new LabelStyle(Assets.titleFont, Color.valueOf("F26937"));
 
     private final Label highScoreField;
 

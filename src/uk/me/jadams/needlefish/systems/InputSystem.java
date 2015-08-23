@@ -37,11 +37,11 @@ public class InputSystem extends IteratingSystem
         float vx = 0;
         float vy = 0;
 
-        if (Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D))
+        if (Gdx.input.isKeyPressed(Keys.LEFT) && !Gdx.input.isKeyPressed(Keys.RIGHT))
         {
             vx = -25;
         }
-        else if (Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A))
+        else if (Gdx.input.isKeyPressed(Keys.RIGHT) && !Gdx.input.isKeyPressed(Keys.LEFT))
         {
             vx = 25;
         }
@@ -50,11 +50,11 @@ public class InputSystem extends IteratingSystem
             vx = 0;
         }
 
-        if (Gdx.input.isKeyPressed(Keys.W) && !Gdx.input.isKeyPressed(Keys.S))
+        if (Gdx.input.isKeyPressed(Keys.UP) && !Gdx.input.isKeyPressed(Keys.DOWN))
         {
             vy = 25;
         }
-        else if (Gdx.input.isKeyPressed(Keys.S) && !Gdx.input.isKeyPressed(Keys.W))
+        else if (Gdx.input.isKeyPressed(Keys.DOWN) && !Gdx.input.isKeyPressed(Keys.UP))
         {
             vy = -25;
         }
@@ -78,10 +78,5 @@ public class InputSystem extends IteratingSystem
         Vector2 mr = new Vector2(mc.x, mc.y);
         float angle = (float) (mr.angle() / 360 * 2 * Math.PI);
         body.body.setTransform(x, y, angle);
-        
-//        if (Gdx.input.isKeyJustPressed(Keys.SPACE))
-//        {
-//            B2DObjectFactory.projectile(world, x, y, angle);
-//        }
     }
 }

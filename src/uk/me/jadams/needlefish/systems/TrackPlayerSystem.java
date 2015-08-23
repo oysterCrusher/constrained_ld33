@@ -1,4 +1,4 @@
-package uk.me.jadams.needlefish.systems.aimovement;
+package uk.me.jadams.needlefish.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;

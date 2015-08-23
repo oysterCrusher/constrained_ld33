@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import uk.me.jadams.needlefish.Assets;
 import uk.me.jadams.needlefish.CollisionData;
 import uk.me.jadams.needlefish.FixtureTypes;
 import uk.me.jadams.needlefish.Particles;
@@ -61,6 +62,8 @@ public class EnemyBulletSystem extends IteratingSystem
                         world.destroyBody(collisonData.getOtherBody());
 
                         effect.start(body.getPosition().x, body.getPosition().y);
+                        
+                        Assets.enemyExplode.play();
                     }
 
                     collisonData.markProcessed();

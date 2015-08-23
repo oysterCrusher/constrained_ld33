@@ -143,4 +143,4 @@ additive: false
 behind: false
 premultipliedAlpha: false
 - Image Path -
-C:\Users\John\Code\needlefish\core\assets\particle_player.png
+C:\Users\John\Code\needlefish\core\assets\particle_wall.png
