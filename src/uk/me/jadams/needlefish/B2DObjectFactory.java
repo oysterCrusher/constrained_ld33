@@ -23,7 +23,7 @@ public class B2DObjectFactory
     private static final short CATEGORY_WALL = 0x0008;
     
     private static final short MASK_BULLET = CATEGORY_AI | CATEGORY_WALL | CATEGORY_PLAYER;
-    private static final short MASK_AI = CATEGORY_BULLET | CATEGORY_PLAYER;
+    private static final short MASK_AI = CATEGORY_BULLET | CATEGORY_PLAYER | CATEGORY_AI;
 
     private B2DObjectFactory()
     {
@@ -43,7 +43,7 @@ public class B2DObjectFactory
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = shape;
-        fixDef.density = 1f;
+        fixDef.density = 0.1f;
         fixDef.restitution = 0;
         fixDef.friction = 0;
         fixDef.filter.categoryBits = CATEGORY_PLAYER;
@@ -63,7 +63,6 @@ public class B2DObjectFactory
     {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-//        bodyDef.position.set(10, 10);
 
         Body body = world.createBody(bodyDef);
 
@@ -81,7 +80,7 @@ public class B2DObjectFactory
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = shape;
-        fixDef.density = 1f;
+        fixDef.density = 0.1f;
         fixDef.filter.categoryBits = CATEGORY_WALL;
 
         Fixture fixture = body.createFixture(fixDef);
@@ -97,19 +96,19 @@ public class B2DObjectFactory
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         
-        float sx = (float) (x + Math.cos(angle) * 2);
-        float sy = (float) (y + Math.sin(angle) * 2);
+        float sx = (float) (x + Math.cos(angle) * 3);
+        float sy = (float) (y + Math.sin(angle) * 3);
         bodyDef.position.set(sx, sy);
 
         Body body = world.createBody(bodyDef);
         body.setBullet(true);
 
         CircleShape shape = new CircleShape();
-        shape.setRadius(0.5f);
+        shape.setRadius(0.4f);
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = shape;
-        fixDef.density = 1f;
+        fixDef.density = 0.1f;
         fixDef.restitution = 1;
         fixDef.friction = 0;
         fixDef.filter.categoryBits = CATEGORY_BULLET;
@@ -124,18 +123,19 @@ public class B2DObjectFactory
         Box2DSprite sprite = new Box2DSprite(Assets.bullet);
         body.setUserData(sprite);
 
-        float vx = (float) (Math.cos(angle) * 10);
-        float vy = (float) (Math.sin(angle) * 10);
+        float vx = (float) (Math.cos(angle) * 30);
+        float vy = (float) (Math.sin(angle) * 30);
 
         body.setLinearVelocity(vx, vy);
         return body;
     }
     
-    public static Body ai(PooledEngine engine, World world)
+    public static Body ai(PooledEngine engine, World world, Vector2 pos)
     {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(-20, 108 / 2);
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
+
+        bodyDef.position.set(pos);
         bodyDef.angle = (float) (Math.PI / 2f);
 
         Body body = world.createBody(bodyDef);
@@ -145,7 +145,7 @@ public class B2DObjectFactory
 
         FixtureDef fixDef = new FixtureDef();
         fixDef.shape = shape;
-        fixDef.density = 1f;
+        fixDef.density = 0.1f;
         fixDef.restitution = 0;
         fixDef.friction = 0;
         fixDef.filter.categoryBits = CATEGORY_AI;

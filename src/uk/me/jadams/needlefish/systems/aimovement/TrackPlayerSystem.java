@@ -31,14 +31,19 @@ public class TrackPlayerSystem extends IteratingSystem
     {
         Body body = bodyMap.get(entity).body;
         
-        float vx = player.getPosition().x - body.getPosition().x;
-        float vy = player.getPosition().y - body.getPosition().y;
+        float desired_vx = player.getPosition().x - body.getPosition().x;
+        float desired_vy = player.getPosition().y - body.getPosition().y;
         
-        Vector2 v = new Vector2(vx, vy);
-        v.nor();
-        v = v.scl(20);
+        Vector2 desired_v = new Vector2(desired_vx, desired_vy);
+        desired_v.nor();
+        desired_v = desired_v.scl(15);
 
-        body.setLinearVelocity(v);
+//        desired_v.sub(body.getLinearVelocity());
+//        desired_v.scl(body.getMass());
+
+//        body.applyLinearImpulse(desired_v, body.getPosition(), true);
+        
+        body.setLinearVelocity(desired_v);
     }
 
 }

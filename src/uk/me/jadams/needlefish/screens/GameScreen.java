@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
@@ -19,39 +18,50 @@ import uk.me.jadams.needlefish.B2DObjectFactory;
 import uk.me.jadams.needlefish.CollisionData;
 import uk.me.jadams.needlefish.FixtureTypes;
 import uk.me.jadams.needlefish.MyContactListener;
+import uk.me.jadams.needlefish.Needlefish;
 import uk.me.jadams.needlefish.Particles;
 import uk.me.jadams.needlefish.Utils;
 import uk.me.jadams.needlefish.components.BodyComponent;
 import uk.me.jadams.needlefish.components.InputComponent;
 import uk.me.jadams.needlefish.systems.CollisionSystem;
+import uk.me.jadams.needlefish.systems.EnemySpawnSystem;
 import uk.me.jadams.needlefish.systems.InputSystem;
+import uk.me.jadams.needlefish.systems.PlayerShootingSystem;
 import uk.me.jadams.needlefish.systems.aimovement.TrackPlayerSystem;
 import uk.me.jadams.needlefish.systems.collision.EnemyBulletSystem;
-import uk.me.jadams.needlefish.systems.collision.PlayerBulletSystem;
+import uk.me.jadams.needlefish.systems.collision.PlayerCollisionSystem;
 
 public class GameScreen implements Screen
 {
+    private final Needlefish needlefish;
+    
     private final OrthographicCamera camera;
 
     private final SpriteBatch batch;
 
-    private final PooledEngine engine;
+    private PooledEngine engine;
 
-    private final Body walls;
+    private Body walls;
 
-    private final World world;
+    private World world;
 
-    private final Entity player;
+    private Entity player;
 
-    private final Box2DDebugRenderer b2dDebugRenderer;
+    private Particles playerExplode;
 
-    private final Particles playerExplode;
-
-    public GameScreen(OrthographicCamera camera, SpriteBatch batch)
+    public GameScreen(Needlefish needlefish, OrthographicCamera camera, SpriteBatch batch)
     {
+        this.needlefish = needlefish;
         this.camera = camera;
         this.batch = batch;
+    }
 
+    @Override
+    public void show()
+    {
+        camera.setToOrtho(false, 192, 108);
+        batch.setProjectionMatrix(camera.combined);
+        
         engine = new PooledEngine();
 
         world = new World(new Vector2(0, 0), true);
@@ -69,32 +79,21 @@ public class GameScreen implements Screen
         player.add(new BodyComponent(playerBody));
         player.add(new InputComponent());
 
-        engine.addSystem(new InputSystem(camera, world));
+        engine.addSystem(new InputSystem(camera));
         engine.addSystem(new TrackPlayerSystem(playerBody));
-        engine.addSystem(new PlayerBulletSystem(playerExplode));
+        engine.addSystem(new PlayerCollisionSystem(needlefish, playerExplode));
         engine.addSystem(new EnemyBulletSystem(world, engine));
         engine.addSystem(new CollisionSystem());
+        engine.addSystem(new EnemySpawnSystem(world, engine));
+        engine.addSystem(new PlayerShootingSystem(world, playerBody));
 
         engine.addEntity(player);
-
-        b2dDebugRenderer = new Box2DDebugRenderer();
-
-        B2DObjectFactory.ai(engine, world);
-    }
-
-    @Override
-    public void show()
-    {
-        camera.setToOrtho(false, 192, 108);
-//        camera.position.x = 192 / 2;
-//        camera.position.y = 0;
-//        camera.update();
-        batch.setProjectionMatrix(camera.combined);
     }
 
     @Override
     public void render(float delta)
     {
+        delta = 1 / 60f;
         world.step(delta, 6, 2);
         wallCollisions();
         engine.update(delta);
@@ -106,7 +105,6 @@ public class GameScreen implements Screen
         Box2DSprite.draw(batch, world);
 
         batch.end();
-//        b2dDebugRenderer.render(world, camera.combined);
     }
 
     @Override
@@ -182,7 +180,7 @@ public class GameScreen implements Screen
 
             Vector2 lastVertex = new Vector2();
             shape.getVertex(0, lastVertex);
-            
+
             for (int i = 1; i < nVertices; i++)
             {
                 Vector2 vertex = new Vector2();
@@ -190,21 +188,17 @@ public class GameScreen implements Screen
 
                 float w = Math.abs(vertex.x - lastVertex.x);
                 float h = Math.abs(vertex.y - lastVertex.y);
-                
+
                 float l = (float) Math.sqrt(w * w + h * h);
 
                 float angle = 270 - (float) (Math.atan2((vertex.x - lastVertex.x), (vertex.y - lastVertex.y)) / Math.PI * 180);
 
                 batch.draw(Assets.wall, vertex.x, vertex.y, 0, 0, l, 0.7f, 1, 1, angle, 0, 0, 1, 1, false, false);
-                
-                float vx = vertex.x + (vertex.x - lastVertex.x) / l * 0.3f;
-                float vy = vertex.y + (vertex.y - lastVertex.y) / l * 0.3f;
+
                 batch.draw(Assets.vertex, vertex.x - 0.9f, vertex.y - 0.9f, 1.8f, 1.8f);
 
                 lastVertex.x = vertex.x;
                 lastVertex.y = vertex.y;
-                
-                
             }
         }
     }

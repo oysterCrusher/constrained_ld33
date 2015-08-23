@@ -9,9 +9,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.World;
 
-import uk.me.jadams.needlefish.B2DObjectFactory;
 import uk.me.jadams.needlefish.components.BodyComponent;
 import uk.me.jadams.needlefish.components.InputComponent;
 
@@ -20,16 +18,13 @@ public class InputSystem extends IteratingSystem
     private final ComponentMapper<BodyComponent> bodyMap;
 
     private final OrthographicCamera camera;
-    
-    private final World world;
 
     @SuppressWarnings("unchecked")
-    public InputSystem(OrthographicCamera camera, World world)
+    public InputSystem(OrthographicCamera camera)
     {
         super(Family.all(BodyComponent.class, InputComponent.class).get());
 
         this.camera = camera;
-        this.world = world;
 
         bodyMap = ComponentMapper.getFor(BodyComponent.class);
     }
@@ -44,11 +39,11 @@ public class InputSystem extends IteratingSystem
 
         if (Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D))
         {
-            vx = -35;
+            vx = -25;
         }
         else if (Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A))
         {
-            vx = 35;
+            vx = 25;
         }
         else
         {
@@ -57,11 +52,11 @@ public class InputSystem extends IteratingSystem
 
         if (Gdx.input.isKeyPressed(Keys.W) && !Gdx.input.isKeyPressed(Keys.S))
         {
-            vy = 35;
+            vy = 25;
         }
         else if (Gdx.input.isKeyPressed(Keys.S) && !Gdx.input.isKeyPressed(Keys.W))
         {
-            vy = -35;
+            vy = -25;
         }
         else
         {
@@ -84,9 +79,9 @@ public class InputSystem extends IteratingSystem
         float angle = (float) (mr.angle() / 360 * 2 * Math.PI);
         body.body.setTransform(x, y, angle);
         
-        if (Gdx.input.isKeyJustPressed(Keys.SPACE))
-        {
-            B2DObjectFactory.projectile(world, x, y, angle);
-        }
+//        if (Gdx.input.isKeyJustPressed(Keys.SPACE))
+//        {
+//            B2DObjectFactory.projectile(world, x, y, angle);
+//        }
     }
 }

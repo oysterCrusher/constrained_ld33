@@ -17,6 +17,7 @@ public class Needlefish extends Game
     private OrthographicCamera camera;
     private Texture texture;
     
+    public MenuScreen menuScreen;
     public GameScreen gameScreen;
 
     @Override
@@ -34,8 +35,8 @@ public class Needlefish extends Game
         texture = Assets.bg;
         texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
         
-        MenuScreen menuScreen = new MenuScreen(this, camera, batch);
-        gameScreen = new GameScreen(camera, batch);
+        menuScreen = new MenuScreen(this, camera, batch);
+        gameScreen = new GameScreen(this, camera, batch);
         this.setScreen(menuScreen);
     }
 

@@ -10,22 +10,26 @@ import com.badlogic.gdx.utils.Array;
 
 import uk.me.jadams.needlefish.CollisionData;
 import uk.me.jadams.needlefish.FixtureTypes;
+import uk.me.jadams.needlefish.Needlefish;
 import uk.me.jadams.needlefish.Particles;
 import uk.me.jadams.needlefish.Utils;
 import uk.me.jadams.needlefish.components.BodyComponent;
 import uk.me.jadams.needlefish.components.InputComponent;
 
-public class PlayerBulletSystem extends IteratingSystem
+public class PlayerCollisionSystem extends IteratingSystem
 {
+    private final Needlefish needlefish;
+
     private final ComponentMapper<BodyComponent> bodyMap;
 
     private final Particles deathParticles;
 
     @SuppressWarnings("unchecked")
-    public PlayerBulletSystem(Particles deathParticles)
+    public PlayerCollisionSystem(Needlefish needlefish, Particles deathParticles)
     {
         super(Family.all(BodyComponent.class, InputComponent.class).get());
 
+        this.needlefish = needlefish;
         this.deathParticles = deathParticles;
 
         bodyMap = ComponentMapper.getFor(BodyComponent.class);
@@ -50,7 +54,13 @@ public class PlayerBulletSystem extends IteratingSystem
                     {
                         deathParticles.start(body.getPosition().x, body.getPosition().y);
 
-                        // TODO - Kill/damage the player.
+                        needlefish.setScreen(needlefish.menuScreen);
+                    }
+                    else if (collisonData.getAgainst() == FixtureTypes.AI)
+                    {
+                        deathParticles.start(body.getPosition().x, body.getPosition().y);
+
+                        needlefish.setScreen(needlefish.menuScreen);
                     }
 
                     collisonData.markProcessed();
