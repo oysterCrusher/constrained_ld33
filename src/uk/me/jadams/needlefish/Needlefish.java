@@ -34,23 +34,26 @@ public class Needlefish extends Game
 
         texture = Assets.bg;
         texture.setWrap(TextureWrap.Repeat, TextureWrap.Repeat);
-        
+
+        Scoring scoring = new Scoring();
+
         menuScreen = new MenuScreen(this, camera, batch);
-        gameScreen = new GameScreen(this, camera, batch);
+        gameScreen = new GameScreen(this, camera, batch, scoring);
+//        overScreen = new GameOverScreen(this, camera, batch, scoring, engine, world);
         this.setScreen(menuScreen);
     }
 
     @Override
     public void render()
     {
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0, 1);
+        Gdx.gl.glClearColor(0.0f, 0.0f, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.setProjectionMatrix(camera.combined);
 
-        batch.begin();
-        batch.draw(texture, 0, 0, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 1080 / 32);
-        batch.end();
+//        batch.begin();
+//        batch.draw(texture, 0, 0, camera.viewportWidth, camera.viewportHeight, 0, 0, 1, 1080 / 32);
+//        batch.end();
         
         super.render();
     }

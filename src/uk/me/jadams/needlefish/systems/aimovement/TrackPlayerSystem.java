@@ -30,20 +30,23 @@ public class TrackPlayerSystem extends IteratingSystem
     protected void processEntity(Entity entity, float deltaTime)
     {
         Body body = bodyMap.get(entity).body;
-        
-        float desired_vx = player.getPosition().x - body.getPosition().x;
-        float desired_vy = player.getPosition().y - body.getPosition().y;
-        
-        Vector2 desired_v = new Vector2(desired_vx, desired_vy);
-        desired_v.nor();
-        desired_v = desired_v.scl(15);
 
-//        desired_v.sub(body.getLinearVelocity());
-//        desired_v.scl(body.getMass());
+        if (player != null)
+        {
+            float desired_vx = player.getPosition().x - body.getPosition().x;
+            float desired_vy = player.getPosition().y - body.getPosition().y;
 
-//        body.applyLinearImpulse(desired_v, body.getPosition(), true);
-        
-        body.setLinearVelocity(desired_v);
+            Vector2 desired_v = new Vector2(desired_vx, desired_vy);
+            desired_v.nor();
+            desired_v = desired_v.scl(15);
+
+            //        desired_v.sub(body.getLinearVelocity());
+            //        desired_v.scl(body.getMass());
+
+            //        body.applyLinearImpulse(desired_v, body.getPosition(), true);
+
+            body.setLinearVelocity(desired_v);
+        }
     }
 
 }

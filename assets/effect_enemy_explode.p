@@ -1,12 +1,12 @@
-effect_player_explode
+effect_enemy_explode
 - Delay -
 active: false
 - Duration - 
-lowMin: 100.0
-lowMax: 100.0
+lowMin: 50.0
+lowMax: 50.0
 - Count - 
 min: 0
-max: 100
+max: 50
 - Emission - 
 lowMin: 25000.0
 lowMax: 25000.0
@@ -20,8 +20,8 @@ timeline0: 0.0
 - Life - 
 lowMin: 1000.0
 lowMax: 1000.0
-highMin: 3000.0
-highMax: 4000.0
+highMin: 2000.0
+highMax: 3000.0
 relative: false
 scalingCount: 3
 scaling0: 1.0
@@ -143,4 +143,4 @@ additive: false
 behind: false
 premultipliedAlpha: false
 - Image Path -
-C:\Users\John\Code\needlefish\core\assets\particle_player.png
+C:\Users\John\Code\needlefish\core\assets\particle_enemy.png

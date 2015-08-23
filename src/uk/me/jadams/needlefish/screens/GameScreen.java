@@ -2,8 +2,8 @@ package uk.me.jadams.needlefish.screens;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -12,17 +12,15 @@ import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import net.dermetfan.gdx.graphics.g2d.Box2DSprite;
 import uk.me.jadams.needlefish.Assets;
 import uk.me.jadams.needlefish.B2DObjectFactory;
 import uk.me.jadams.needlefish.CollisionData;
 import uk.me.jadams.needlefish.FixtureTypes;
+import uk.me.jadams.needlefish.GameStage;
+import uk.me.jadams.needlefish.MenuStage;
 import uk.me.jadams.needlefish.MyContactListener;
 import uk.me.jadams.needlefish.Needlefish;
 import uk.me.jadams.needlefish.Particles;
@@ -30,7 +28,6 @@ import uk.me.jadams.needlefish.Scoring;
 import uk.me.jadams.needlefish.Utils;
 import uk.me.jadams.needlefish.components.BodyComponent;
 import uk.me.jadams.needlefish.components.InputComponent;
-import uk.me.jadams.needlefish.systems.CollisionSystem;
 import uk.me.jadams.needlefish.systems.EnemySpawnSystem;
 import uk.me.jadams.needlefish.systems.InputSystem;
 import uk.me.jadams.needlefish.systems.PlayerShootingSystem;
@@ -57,62 +54,60 @@ public class GameScreen implements Screen
     private Entity player;
 
     private Particles playerExplode;
+    private Particles enemyExplode;
+    private Particles bulletWall;
 
     private final Scoring scoring;
 
-    private Label score;
+    private final GameStage gameStage;
+    private final MenuStage menuStage;
+    private Stage currentStage;
 
-    private Label timeLabel;
+    private boolean justOver;
+    private boolean isOver;
 
-    private Stage stage;
+    private InputSystem inputSystem;
+    private TrackPlayerSystem trackPlayerSystem;
+    private PlayerCollisionSystem playerCollisionSystem;
+    private EnemySpawnSystem enemySpawnSystem;
+    private PlayerShootingSystem playerShootingSystem;
 
-    public GameScreen(Needlefish needlefish, OrthographicCamera camera, SpriteBatch batch)
+    public GameScreen(Needlefish needlefish, OrthographicCamera camera, SpriteBatch batch, Scoring scoring)
     {
         this.needlefish = needlefish;
         this.camera = camera;
         this.batch = batch;
-
-        scoring = new Scoring();
+        this.scoring = scoring;
 
         uiCamera = new OrthographicCamera(1920, 1080);
+        
+        gameStage = new GameStage(uiCamera, batch);
+        menuStage = new MenuStage(needlefish, uiCamera, batch);
     }
 
     @Override
     public void show()
     {
-        scoring.reset();
+        isOver = false;
+        justOver = false;
 
+        scoring.start();
+
+        engine = new PooledEngine();
+        
         camera.setToOrtho(false, 192, 108);
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
-        ScreenViewport stageViewport = new ScreenViewport(uiCamera);
-        stage = new Stage(stageViewport, batch);
-//        stage.setDebugAll(true);
-
-        Table table = new Table();
-        table.setFillParent(true);
-        table.left().top();
-
-        LabelStyle labelStyle = new LabelStyle(Assets.titleFont, Color.valueOf("8DA7BEFF"));
-
-        score = new Label("" + scoring.getScore(), labelStyle);
-        score.setFontScale(0.8f);
-
-        timeLabel = new Label("" + scoring.getTimer(), labelStyle);
-        timeLabel.setFontScale(0.8f);
-
-        table.add(score).left().top().pad(40, 40, 10, 10);
-        table.row();
-        table.add(timeLabel).left().top().pad(10, 40, 10, 10);
-
-        stage.addActor(table);
-
-        engine = new PooledEngine();
+        gameStage.setHighScore(scoring.getHighScoreString());
+        currentStage = gameStage;
+        Gdx.input.setInputProcessor(currentStage);
 
         world = new World(new Vector2(0, 0), true);
 
         playerExplode = new Particles("effect_player_explode.p");
+        enemyExplode = new Particles("effect_enemy_explode.p");
+        bulletWall = new Particles("effect_bullet_wall.p");
 
         MyContactListener contactListener = new MyContactListener();
         world.setContactListener(contactListener);
@@ -125,13 +120,22 @@ public class GameScreen implements Screen
         player.add(new BodyComponent(playerBody));
         player.add(new InputComponent());
 
-        engine.addSystem(new InputSystem(camera));
-        engine.addSystem(new TrackPlayerSystem(playerBody));
-        engine.addSystem(new PlayerCollisionSystem(needlefish, playerExplode));
-        engine.addSystem(new EnemyBulletSystem(world, engine, scoring));
-        engine.addSystem(new CollisionSystem());
-        engine.addSystem(new EnemySpawnSystem(world, engine));
-        engine.addSystem(new PlayerShootingSystem(world, playerBody));
+        inputSystem = new InputSystem(camera);
+        engine.addSystem(inputSystem);
+
+        trackPlayerSystem = new TrackPlayerSystem(playerBody);
+        engine.addSystem(trackPlayerSystem);
+
+        playerCollisionSystem = new PlayerCollisionSystem(this, world, engine, playerExplode);
+        engine.addSystem(playerCollisionSystem);
+
+        engine.addSystem(new EnemyBulletSystem(world, engine, enemyExplode));
+
+        enemySpawnSystem = new EnemySpawnSystem(world, engine);
+        engine.addSystem(enemySpawnSystem);
+
+        playerShootingSystem = new PlayerShootingSystem(world, playerBody);
+        engine.addSystem(playerShootingSystem);
 
         engine.addEntity(player);
     }
@@ -140,30 +144,51 @@ public class GameScreen implements Screen
     public void render(float delta)
     {
         delta = 1 / 60f;
+
         world.step(delta, 6, 2);
+
         wallCollisions();
+
         engine.update(delta);
 
         batch.begin();
 
-        scoring.update(delta);
+        if (!isOver)
+        {
+            scoring.update(delta);
+            gameStage.setScore(scoring.getScoreString());
+        }
 
+        // Render particle effects.
         playerExplode.render(batch, delta);
+        enemyExplode.render(batch, delta);
+        bulletWall.render(batch, delta);
+
         drawWalls();
         Box2DSprite.draw(batch, world);
 
         batch.end();
 
-        score.setText("" + scoring.getScore());
-        timeLabel.setText(scoring.getTimeString());
-        stage.act(delta);
-        stage.draw();
+        currentStage.act(delta);
+        currentStage.draw();
+
+        if (justOver)
+        {
+            scoring.end();
+            menuStage.setHighScore(scoring.getHighScoreString());
+            menuStage.setLastScore(scoring.getScoreString());
+            currentStage = menuStage;
+            Gdx.input.setInputProcessor(currentStage);
+            stopSystems();
+            justOver = false;
+        }
     }
 
     @Override
     public void resize(int width, int height)
     {
-        stage.getViewport().update(width, height, true);
+        gameStage.getViewport().update(width, height);
+        menuStage.getViewport().update(width, height);
     }
 
     @Override
@@ -187,7 +212,8 @@ public class GameScreen implements Screen
     @Override
     public void dispose()
     {
-        stage.dispose();
+        gameStage.dispose();
+        menuStage.dispose();
         world.dispose();
     }
 
@@ -205,7 +231,9 @@ public class GameScreen implements Screen
                 {
                     if (collisonData.getAgainst() == FixtureTypes.BULLET)
                     {
-                        // TODO - Particle effect?
+                        float x = collisonData.getX();
+                        float y = collisonData.getY();
+                        bulletWall.start(x, y);
                     }
 
                     collisonData.markProcessed();
@@ -255,5 +283,20 @@ public class GameScreen implements Screen
                 lastVertex.y = vertex.y;
             }
         }
+    }
+
+    public void over()
+    {
+        isOver = true;
+        justOver = true;
+    }
+    
+    public void stopSystems()
+    {
+        engine.removeSystem(inputSystem);
+        engine.removeSystem(trackPlayerSystem);
+        engine.removeSystem(playerCollisionSystem);
+        engine.removeSystem(enemySpawnSystem);
+        engine.removeSystem(playerShootingSystem);
     }
 }

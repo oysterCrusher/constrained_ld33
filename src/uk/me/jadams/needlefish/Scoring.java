@@ -1,47 +1,62 @@
 package uk.me.jadams.needlefish;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+
 public class Scoring
 {
-    private int score;
-    
-    private float timer;
-    
+    private float highScore;
+
+    private float time;
+
     public Scoring()
     {
-        reset();
+        start();
+        
+        Preferences prefs = Gdx.app.getPreferences("needlefish");
+        highScore = prefs.getFloat("score", 0);
+    }
+
+    public void start()
+    {
+        time = 0;
     }
     
-    public void reset()
+    public void end()
     {
-        score = 0;
-        timer = 0;
+        if (time > highScore)
+        {
+            highScore = time;
+            Preferences prefs = Gdx.app.getPreferences("needlefish");
+            prefs.putFloat("score", time);
+            prefs.flush();
+        }
     }
-    
-    public int getScore()
+
+    public float getScore()
     {
-        return score;
+        return time;
     }
-    
-    public float getTimer()
+
+    public String getHighScoreString()
     {
-        return timer;
-    }
-    
-    public void add(int score)
-    {
-        this.score += score;
+        return format(highScore);
     }
 
     public void update(float delta)
     {
-        timer += delta;
+        time += delta;
     }
 
-    public CharSequence getTimeString()
+    public String getScoreString()
     {
-        int mins = (int) timer / 60;
-        int secs = (int) timer % 60;
-        int mils = (int) (timer * 10) % 10;
-        return mins + ":" + secs + ":" + mils;
+        return format(time);
+    }
+    
+    private String format(float score)
+    {
+        int secs = (int) score;
+        int mils = (int) (score * 10) % 10;
+        return secs + "." + mils;
     }
 }
