@@ -63,19 +63,19 @@ public class B2DObjectFactory
     {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(10, 10);
+//        bodyDef.position.set(10, 10);
 
         Body body = world.createBody(bodyDef);
 
         ChainShape shape = new ChainShape();
 
         Vector2[] vertices = new Vector2[6];
-        vertices[0] = new Vector2(0, 40);
-        vertices[1] = new Vector2(80, 10);
-        vertices[2] = new Vector2(160, 40);
-        vertices[3] = new Vector2(160, 60);
-        vertices[4] = new Vector2(80, 88);
-        vertices[5] = new Vector2(0, 60);
+        vertices[0] = new Vector2(40, 40);
+        vertices[1] = new Vector2(192 / 2, 10);
+        vertices[2] = new Vector2(192 - 40, 40);
+        vertices[3] = new Vector2(192 - 40, 68);
+        vertices[4] = new Vector2(192 / 2, 98);
+        vertices[5] = new Vector2(40, 68);
 
         shape.createLoop(vertices);
 
@@ -88,7 +88,7 @@ public class B2DObjectFactory
         fixture.setUserData(new CollisionData(FixtureTypes.WALL));
 
         shape.dispose();
-
+        
         return body;
     }
 

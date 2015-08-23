@@ -41,8 +41,8 @@ public class MyContactListener implements ContactListener
             return;
         }
 
-        collisionDataA.setCollision(collisionDataB.myType, 0, x, y);
-        collisionDataB.setCollision(collisionDataA.myType, 0, x, y);
+        collisionDataA.setCollision(collisionDataB.myType, contact.getFixtureB().getBody(), 0, x, y);
+        collisionDataB.setCollision(collisionDataA.myType, contact.getFixtureA().getBody(), 0, x, y);
     }
 
     private CollisionData getCollisionData(Fixture fixture)

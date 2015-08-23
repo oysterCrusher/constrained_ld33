@@ -1,5 +1,7 @@
 package uk.me.jadams.needlefish;
 
+import com.badlogic.gdx.physics.box2d.Body;
+
 public class CollisionData
 {
     public final FixtureTypes myType;
@@ -7,6 +9,8 @@ public class CollisionData
     private boolean processed;
     
     private FixtureTypes against;
+    
+    private Body otherBody;
     
     private float impulse;
     
@@ -24,10 +28,11 @@ public class CollisionData
         y = 0;
     }
     
-    public void setCollision(FixtureTypes against, float impulse, float x, float y)
+    public void setCollision(FixtureTypes against, Body body, float impulse, float x, float y)
     {
         this.against = against;
         this.impulse = impulse;
+        this.otherBody = body;
         this.x = x;
         this.y = y;
         
@@ -49,6 +54,11 @@ public class CollisionData
         return impulse;
     }
     
+    public Body getOtherBody()
+    {
+        return otherBody;
+    }
+
     public float getX()
     {
         return x;

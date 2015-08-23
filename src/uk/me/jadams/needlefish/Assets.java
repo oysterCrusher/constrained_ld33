@@ -10,6 +10,8 @@ public class Assets
     public static Texture player;
     public static Texture bullet;
     public static Texture enemy;
+    public static Texture wall;
+    public static Texture vertex;
     public static BitmapFont titleFont;
     
     private static Texture loadTexture(String file)
@@ -28,6 +30,8 @@ public class Assets
         player = loadTexture("player.png");
         bullet = loadTexture("bullet.png");
         enemy = loadTexture("enemy.png");
+        wall = loadTexture("wall.png");
+        vertex = loadTexture("vertex.png");
         
         titleFont = loadFont("bpdotssquares.fnt");
     }
