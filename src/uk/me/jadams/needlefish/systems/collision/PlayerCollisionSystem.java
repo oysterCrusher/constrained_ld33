@@ -7,7 +7,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 import uk.me.jadams.needlefish.Assets;
@@ -23,8 +22,6 @@ public class PlayerCollisionSystem extends IteratingSystem
 {
     private final GameScreen game;
 
-    private final World world;
-    
     private final Engine engine;
 
     private final ComponentMapper<BodyComponent> bodyMap;
@@ -32,12 +29,11 @@ public class PlayerCollisionSystem extends IteratingSystem
     private final Particles deathParticles;
 
     @SuppressWarnings("unchecked")
-    public PlayerCollisionSystem(GameScreen game, World world, Engine engine, Particles deathParticles)
+    public PlayerCollisionSystem(GameScreen game, Engine engine, Particles deathParticles)
     {
         super(Family.all(BodyComponent.class, InputComponent.class).get());
 
         this.game = game;
-        this.world = world;
         this.engine = engine;
         this.deathParticles = deathParticles;
 
@@ -64,8 +60,8 @@ public class PlayerCollisionSystem extends IteratingSystem
                         deathParticles.start(body.getPosition().x, body.getPosition().y);
 
                         engine.removeEntity(entity);
-                        world.destroyBody(body);
-                        world.destroyBody(collisonData.getOtherBody());
+                        game.destroyBody(body);
+                        game.destroyBody(collisonData.getOtherBody());
                         game.over();
                         
                         Assets.enemyExplode.play();
@@ -75,7 +71,7 @@ public class PlayerCollisionSystem extends IteratingSystem
                         deathParticles.start(body.getPosition().x, body.getPosition().y);
 
                         engine.removeEntity(entity);
-                        world.destroyBody(body);
+                        game.destroyBody(body);
                         game.over();
                         
                         Assets.enemyExplode.play();

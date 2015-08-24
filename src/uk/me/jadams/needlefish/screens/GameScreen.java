@@ -1,5 +1,9 @@
 package uk.me.jadams.needlefish.screens;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
@@ -69,6 +73,8 @@ public class GameScreen implements Screen
     private PlayerCollisionSystem playerCollisionSystem;
     private EnemySpawnSystem enemySpawnSystem;
     private PlayerShootingSystem playerShootingSystem;
+    
+    private List<Body> bodiesToDestroy = new LinkedList<Body>();
 
     public GameScreen(Needlefish needlefish, OrthographicCamera camera, SpriteBatch batch, Scoring scoring)
     {
@@ -123,10 +129,10 @@ public class GameScreen implements Screen
         trackPlayerSystem = new TrackPlayerSystem(playerBody);
         engine.addSystem(trackPlayerSystem);
 
-        playerCollisionSystem = new PlayerCollisionSystem(this, world, engine, playerExplode);
+        playerCollisionSystem = new PlayerCollisionSystem(this, engine, playerExplode);
         engine.addSystem(playerCollisionSystem);
 
-        engine.addSystem(new EnemyBulletSystem(world, engine, enemyExplode));
+        engine.addSystem(new EnemyBulletSystem(this, engine, enemyExplode));
 
         enemySpawnSystem = new EnemySpawnSystem(world, engine);
         engine.addSystem(enemySpawnSystem);
@@ -160,6 +166,8 @@ public class GameScreen implements Screen
         playerExplode.render(batch, delta);
         enemyExplode.render(batch, delta);
         bulletWall.render(batch, delta);
+
+        destroyBodies();
 
         drawWalls();
         Box2DSprite.draw(batch, world);
@@ -298,5 +306,21 @@ public class GameScreen implements Screen
         engine.removeSystem(playerCollisionSystem);
         engine.removeSystem(enemySpawnSystem);
         engine.removeSystem(playerShootingSystem);
+    }
+    
+    public void destroyBody(Body body)
+    {
+        bodiesToDestroy.add(body);
+    }
+    
+    private void destroyBodies()
+    {
+        Iterator<Body> it = bodiesToDestroy.iterator();
+        while (it.hasNext())
+        {
+            Body b = it.next();
+            world.destroyBody(b);
+            it.remove();
+        }
     }
 }
